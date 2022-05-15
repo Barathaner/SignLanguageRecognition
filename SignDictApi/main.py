@@ -1,3 +1,5 @@
+import os.path
+
 import numpy as np
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -86,7 +88,13 @@ def downloadVideo(url, fileName):
 
 
 if __name__ == '__main__':
+    # Check for output path
+    path = "outputVideo"
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
 
+    # Read txt, clean dataframe, export dataframe ("dataframe.csv")
     df_words = prepareDataframe()
     print(df_words)
 
