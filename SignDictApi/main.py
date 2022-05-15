@@ -20,7 +20,7 @@ def prepareDataframe():
     df = df[(df[0] >= 100)]
 
     # df[1] = df[1].str.replace('[@#&$%+-/*\\\\]', '')
-    df[1] = df[1].str.replace('[^A-Za-z0-9]', '')
+    df[1] = df[1].str.replace('[^A-Za-z0-9äöüÄÖÜß]', '')
 
     # Remove unnecessary columns
     df = df.drop(columns=[0, 2])
@@ -72,13 +72,20 @@ def querySignDict(word):
     # Execute the query on the transport
     result = client.execute(query)
 
-    # Extract from result the videoUrl from every word (but every word can contain several videos)
-    counter = 0
-    for i in range(0, len(result["search"])):
-        currentVideo = result["search"][i]
+    # Extract the video-URL from the first search result (first match from the query)
+    if len(result["search"]) >= 1:
+        currentVideo = result["search"][0]
         videoUrl = currentVideo["currentVideo"]["videoUrl"]
-        downloadVideo(videoUrl, word + "_" + str(counter))
-        counter += 1
+        downloadVideo(videoUrl, word)
+    else:
+        print("Empty search result for: " + word)
+
+    # counter = 0
+    # for i in range(0, len(result["search"])):
+    #     currentVideo = result["search"][i]
+    #     videoUrl = currentVideo["currentVideo"]["videoUrl"]
+    #     #downloadVideo(videoUrl, word + "_" + str(counter))
+    #     counter += 1
 
 
 def downloadVideo(url, fileName):
