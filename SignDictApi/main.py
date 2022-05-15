@@ -76,7 +76,10 @@ def querySignDict(word):
     if len(result["search"]) >= 1:
         currentVideo = result["search"][0]
         videoUrl = currentVideo["currentVideo"]["videoUrl"]
-        downloadVideo(videoUrl, word)
+        videoWord = currentVideo["text"] # second run: Words are labeled not from dictionary. Word will be labeled from the search result (first matched word)
+        videoWord = videoWord.replace(" ","_")
+
+        downloadVideo(videoUrl, videoWord)
     else:
         print("Empty search result for: " + word)
 
