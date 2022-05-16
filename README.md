@@ -5,6 +5,7 @@
 - convinient: gelabelte Daten über API
 - Bsp: Chalern
 
+--> https://chalearnlap.cvc.uab.cat/dataset/40/description/ NAME: musterkek PW:3-_QfQXGTTJt8a#W
 ## 2. Datensatz verfremden/transformieren - "Aufblähen"
 - Stichwort "augmented data"
 - verändern von: Helligkeit, Farben, Rotation, Translation
