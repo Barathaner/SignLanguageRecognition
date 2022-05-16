@@ -6,6 +6,7 @@
 - Bsp: Chalern
 
 --> https://chalearnlap.cvc.uab.cat/dataset/40/description/ NAME: musterkek PW:3-_QfQXGTTJt8a#W
+--> https://github.com/dxli94/WLASL American(scrapes webpages)
 ## 2. Datensatz verfremden/transformieren - "Aufblähen"
 - Stichwort "augmented data"
 - verändern von: Helligkeit, Farben, Rotation, Translation
