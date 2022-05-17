@@ -1,14 +1,30 @@
 import cv2
 import numpy as np
 import mediapipe as mp
+import pandas as pd
+import glob,os
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 mp_pose = mp.solutions.pose
 
+def createList() -> pd.DataFrame:
+    """
+    train_labels.csv einelesen und Dataframe returnen
+    WortID ersetzen
+    :return: 1. Spalte: Dateiname, 2. Spalte: Wort
+    """
+    return pd.DataFrame()
 
-def createSkeleton(videoPath):
+def clearData():
+
+    for f in glob.glob("train/signer*_depth.mp4"):
+        os.remove(f)
+
+
+
+def createSkeleton(videoPath, styleFunc):
     cap = cv2.VideoCapture(cv2.samples.findFile(videoPath))  # cv2.samples.findFile("signer0_sample1_color.mp4")
 
     if cap.isOpened():
@@ -38,7 +54,6 @@ def createSkeleton(videoPath):
                 image.flags.writeable = False
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 results = hands.process(image)
-
                 # Draw the hand annotations on the image.
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -66,5 +81,12 @@ def createSkeleton(videoPath):
 
 
 if __name__ == "__main__":
+    # Daten holen (manuell downloaden und entzippen)
+    # Funktion, die einen Dataframe mit Dateinamen zurückgibt
+    # createList()
+    # Dataframe in Funktion und erstellt vom Video ein Skelett-Frame
+    # createSkeleton()
+
+    # clearData()
     path = "signer0_sample1_color.mp4"
     createSkeleton(path)
