@@ -9,22 +9,13 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 mp_pose = mp.solutions.pose
 
-def createList() -> pd.DataFrame:
-    """
-    train_labels.csv einelesen und Dataframe returnen
-    WortID ersetzen
-    :return: 1. Spalte: Dateiname, 2. Spalte: Wort
-    """
-    return pd.DataFrame()
-
 def clearData():
 
     for f in glob.glob("train/signer*_depth.mp4"):
         os.remove(f)
 
 
-
-def createSkeleton(videoPath, styleFunc):
+def createSkeleton(videoPath, videoName):
     cap = cv2.VideoCapture(cv2.samples.findFile(videoPath))  # cv2.samples.findFile("signer0_sample1_color.mp4")
 
     if cap.isOpened():
@@ -46,7 +37,7 @@ def createSkeleton(videoPath, styleFunc):
                 if not success:
                     print("Ignoring empty camera frame.")
                     # If loading a video, use 'break' instead of 'continue'.
-                    cv2.imwrite("skeleton.jpg", mask)
+                    cv2.imwrite("train/skeleton/" + videoName + "_color.jpg", mask)
                     break
 
                 # To improve performance, optionally mark the image as not writeable to
@@ -81,12 +72,23 @@ def createSkeleton(videoPath, styleFunc):
 
 
 if __name__ == "__main__":
-    # Daten holen (manuell downloaden und entzippen)
-    # Funktion, die einen Dataframe mit Dateinamen zurückgibt
-    # createList()
-    # Dataframe in Funktion und erstellt vom Video ein Skelett-Frame
-    # createSkeleton()
 
-    # clearData()
-    path = "signer0_sample1_color.mp4"
-    createSkeleton(path)
+    df = pd.read_csv("data/train_labels.csv", sep=",", engine="python", encoding="utf-8", header=None)
+    print(df)
+    """
+    Train-Videos in train/ kopieren
+    Ordner "train/skeleton" und "data" erzeugen
+    Ordner "data/" enthält die train_labels.csv und SignList_Classid_TR_EN.csv
+    """
+    for i in range(0, len(df)):
+        videoName = df.iloc[i][0]
+        videoPath = "train/" + videoName + "_color.mp4"
+        print(videoPath)
+        createSkeleton(videoPath, videoName)
+
+
+
+
+    #clearData()
+    #path = "signer0_sample1_color.mp4"
+    #createSkeleton(path)
