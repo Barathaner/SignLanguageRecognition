@@ -14,7 +14,7 @@ csv.field_size_limit(sys.maxsize)
 def prepareDataframe():
     # https://wortschatz.uni-leipzig.de/de/download
     # Make dataframe from input file
-    df = pd.read_csv("inputData/deu_mixed-typical_2011_10K-words.txt", sep="\t", engine="python", encoding="utf-8",
+    df = pd.read_csv("inputdata/deu_mixed-typical_2011_10K-words.txt", sep="\t", engine="python", encoding="utf-8",
                      on_bad_lines="skip", header=None, quotechar=' ')
     # Remove first 100 wordIDs (special characters)
     df = df[(df[0] >= 100)]
@@ -34,7 +34,7 @@ def prepareDataframe():
     df = df.reset_index()
     df = df.drop(columns=["index"])
 
-    df.to_csv("inputData/dataframe.csv", sep="\t", encoding="utf-8")
+    df.to_csv("inputdata/dataframe.csv", sep="\t", encoding="utf-8")
 
     return df
 
