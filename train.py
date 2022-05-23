@@ -6,7 +6,7 @@ from preprocessing.featureextraction import *
 if __name__ == "__main__":
     #clean data and put it into /data/train/
     dr = Dataretrieval(CleanCHALearn())
-    dr.retrieve()
+    dr.retrieve(["breakfast", "hungry"])
     fe = FeatureExtraction(Skelleting_as_image())
     fe.extractFeature("data/raw")
 

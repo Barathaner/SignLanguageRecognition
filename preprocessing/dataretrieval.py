@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import glob
 import os
+import shutil
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Union, Optional
+import json
+import pandas as pd
+from loguru import logger
 
 
 class Dataretrieval():
@@ -40,7 +44,7 @@ class Dataretrieval():
 
         self._strategy = strategy
 
-    def retrieve(self) -> None:
+    def retrieve(self, word_list) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
@@ -49,8 +53,8 @@ class Dataretrieval():
         # ...
 
         print("Context: Sorting data using the strategy (not sure how it'll do it)")
-        self._strategy.do_algorithm()
-        #print(",".join(result))
+        self._strategy.do_algorithm(word_list)
+        # print(",".join(result))
 
         # ...
 
@@ -65,7 +69,7 @@ class Strategy(ABC):
     """
 
     @abstractmethod
-    def do_algorithm(self):
+    def do_algorithm(self, word_numbers_to_filter: list):
         pass
 
 
@@ -78,12 +82,32 @@ interface. The interface makes them interchangeable in the Context.
 class CleanCHALearn(Strategy):
     """
     CleanCHALEARN
-    TASK: deletes depth images
+    TASK: deletes depth images, filter out spefic words, to have weniger klassen
     """
 
-    def do_algorithm(self):
-        for f in glob.glob("../data/train/signer*_depth.mp4"):
+    def do_algorithm(self, word_numbers_to_filter: list[Union[int, str]], source_folder: Optional[str] = None,
+                     destination_folder: Optional[str] = None):
+        if not source_folder:
+            source_folder = "data/raw/"
+
+        if not destination_folder:
+            destination_folder = "data/train/"
+
+        for f in glob.glob("data/train/signer*_depth.mp4"):
             os.remove(f)
+
+        if isinstance(word_numbers_to_filter[0], str):
+            print(word_numbers_to_filter)
+            dictionary = pd.read_csv('data/testdata/SignList_ClassId_TR_EN.csv').set_index('EN').to_dict()['ClassId']
+            word_numbers_to_filter = [dictionary[word] for word in word_numbers_to_filter]
+
+        df = pd.read_csv('data/testdata/train_labels.csv', header=None)
+        df = df.loc[df[1].isin(word_numbers_to_filter)]
+
+        # move videos to dest
+        for example in df[0]:
+            shutil.move(source_folder + example + ".mp4", destination_folder + example + ".mp4")
+            logger.info('Moved' + example + " from " + source_folder + example + " to " + destination_folder + example)
         pass
 
 
