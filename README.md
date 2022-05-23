@@ -1,5 +1,16 @@
 # SignLanguageRecognition
 
+## Ordnerstruktur
+
+```
+- features/ 
+    - skeletons/
+- raw/
+- testdata/
+- train/
+```
+
+
 ## 1. Datensatz bekommen
 - Minimalanforderung: 2 - 3 verschiedene Gesten
 - convinient: gelabelte Daten über API

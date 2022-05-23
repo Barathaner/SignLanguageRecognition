@@ -7,8 +7,6 @@ __pycache__/
 
 # C extensions
 *.so
-train/
-output/
 
 # Distribution / packaging
 .Python
@@ -58,6 +56,7 @@ cover/
 # Translations
 *.mo
 *.pot
+*.mp4
 
 # Django stuff:
 *.log
