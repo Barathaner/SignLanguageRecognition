@@ -3,4 +3,9 @@
 
 # Data cleaning
 
-# features extraction
+# augmented data
+    # Randomisierung
+
+# Ablegen als Koorinaten Marker
+    # schmaler als Videos
+

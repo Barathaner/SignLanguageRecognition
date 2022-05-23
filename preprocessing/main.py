@@ -3,20 +3,27 @@ import numpy as np
 import mediapipe as mp
 import pandas as pd
 import glob,os
+from typing import Optional
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 mp_pose = mp.solutions.pose
 
-def clearData():
-
+def clear_data():
     for f in glob.glob("train/signer*_depth.mp4"):
         os.remove(f)
 
 
-def createSkeleton(videoPath, videoName):
-    cap = cv2.VideoCapture(cv2.samples.findFile(videoPath))  # cv2.samples.findFile("signer0_sample1_color.mp4")
+def create_skeleton(video_path: Optional[str] = None, videoName):
+    """
+    Das macht hier sachen machen
+
+    :param video_path:
+    :param videoName:
+    :return:
+    """
+    cap = cv2.VideoCapture(cv2.samples.findFile(video_path))  # cv2.samples.findFile("signer0_sample1_color.mp4")
 
     if cap.isOpened():
         # get vcap property
