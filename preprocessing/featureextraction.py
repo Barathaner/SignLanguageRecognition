@@ -43,7 +43,7 @@ class FeatureExtraction():
 
         self._strategy = strategy
 
-    def extractFeature(self,cleaned_data_dir) -> None:
+    def extractFeature(self, cleaned_data_dir) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
@@ -91,11 +91,16 @@ class Skelleting_as_image(Strategy):
 
         video_names = os.listdir(cleaned_data_dir)
         video_paths = [cleaned_data_dir + "/" + vid for vid in video_names]
-        #os.chdir(cleaned_data_dir)
+        # os.chdir(cleaned_data_dir)
         # os.chdir("../features/skeletons")
         for video_name in video_names:
-
-            cap = cv2.VideoCapture(cv2.samples.findFile(cleaned_data_dir + "/" + video_name))  # cv2.samples.findFile("signer0_sample1_color.mp4")
+            try:
+                cap = cv2.VideoCapture(cv2.samples.findFile(
+                    cleaned_data_dir + "/" + video_name))  # cv2.samples.findFile("signer0_sample1_color.mp4")
+            except:
+                print("Shitted in my pants")
+            finally:
+                continue
 
             if cap.isOpened():
                 # get vcap property
@@ -150,8 +155,8 @@ class Skelleting_as_image(Strategy):
                 cap.release()
         pass
 
+
 class anotherfeature(Strategy):
     # TODO
     def do_algorithm(self, cleaned_data_dir):
         pass
-

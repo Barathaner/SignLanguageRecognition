@@ -44,7 +44,8 @@ class Dataretrieval():
 
         self._strategy = strategy
 
-    def retrieve(self, word_list) -> None:
+    def retrieve(self, word_list, source_folder: Optional[str] = None,
+                 destination_folder: Optional[str] = None) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
@@ -53,7 +54,7 @@ class Dataretrieval():
         # ...
 
         print("Context: Sorting data using the strategy (not sure how it'll do it)")
-        self._strategy.do_algorithm(word_list)
+        self._strategy.do_algorithm(word_list,source_folder,destination_folder)
         # print(",".join(result))
 
         # ...
@@ -69,7 +70,8 @@ class Strategy(ABC):
     """
 
     @abstractmethod
-    def do_algorithm(self, word_numbers_to_filter: list):
+    def do_algorithm(self, word_numbers_to_filter: list, source_folder: Optional[str] = None,
+                     destination_folder: Optional[str] = None):
         pass
 
 
@@ -106,10 +108,10 @@ class CleanCHALearn(Strategy):
 
         # move videos to dest
         for example in df[0]:
-            shutil.move(source_folder + example + ".mp4", destination_folder + example + ".mp4")
-            logger.info('Moved' + example + " from " + source_folder + example + " to " + destination_folder + example)
+            if example + "_color.mp4" in os.listdir(source_folder):
+                shutil.copy(source_folder + example + "_color.mp4", destination_folder + example + ".mp4")
+                logger.info('Moved ' + example + " from " + source_folder + example + " to " + destination_folder + example)
         pass
-
 
 class RetrieveSIGNDICT(Strategy):
     # TODO
