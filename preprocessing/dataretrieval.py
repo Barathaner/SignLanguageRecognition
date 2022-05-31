@@ -8,6 +8,7 @@ from typing import List, Union, Optional
 import json
 import pandas as pd
 from loguru import logger
+import csv
 
 
 class Dataretrieval():
@@ -105,7 +106,12 @@ class CleanCHALearn(Strategy):
 
         df = pd.read_csv('data/testdata/train_labels.csv', header=None)
         df = df.loc[df[1].isin(word_numbers_to_filter)]
-
+        df = df.reset_index()
+        with open('train.csv', 'w', newline='') as f:
+            thewriter = csv.writer(f)
+            thewriter.writerow(['file_name','word'])
+            for index, row in df.iterrows():
+                thewriter.writerow([row[0] + '_skeleton.jpg',row[1]])
         # move videos to dest
         for example in df[0]:
             if example + "_color.mp4" in os.listdir(source_folder):
