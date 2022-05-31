@@ -1,7 +1,6 @@
 from preprocessing.dataretrieval import *
 from preprocessing.featureextraction import *
 
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -10,11 +9,11 @@ from os.path import exists
 # training main --> MODEL &&& testing vom CNN -- exportiere Model
 # irgendwoanders visualize main (Model,webcam)--> lädt model und wertet aus und visualisiert
 if __name__ == "__main__":
-    #clean data and put it into /data/train/
-    #dr = Dataretrieval(CleanCHALearn())
-    #dr.retrieve(["sister", "friend"])
-    #fe = FeatureExtraction(Skelleting_as_image())
-    #fe.extractFeature("data/train")
+    # clean data and put it into /data/train/
+    # dr = Dataretrieval(CleanCHALearn())
+    # dr.retrieve(["sister", "friend"])
+    # fe = FeatureExtraction(Skelleting_as_image())
+    # fe.extractFeature("data/train")
     directory = 'data/features/skeletons/'
     df = pd.read_csv(directory + 'train.csv')
 
@@ -31,14 +30,15 @@ if __name__ == "__main__":
 
     def read_image(image_file, label):
         image = tf.io.read_file(directory + image_file)
-        image = tf.image.decode_image(image,channels=3,dtype=tf.float32)
-        return image,label
+        image = tf.image.decode_image(image, channels=3, dtype=tf.float32)
+        return image, label
+
 
     ds_train = ds_train.map(read_image).batch(2)
 
-    for epoch in range(10):
-        for x,y in ds_train:
-            #train here
+    for epoch in range(2):
+        for x, y in ds_train:
+            # train here
             pass
 
     model = keras.Sequential(
@@ -59,6 +59,4 @@ if __name__ == "__main__":
         metrics=["accuracy"],
     )
 
-    model.fit(ds_train, epochs=10, verbose=2)
-
-
+    model.fit(ds_train, epochs=2, verbose=2)
