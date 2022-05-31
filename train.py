@@ -43,12 +43,13 @@ if __name__ == "__main__":
 
     model = keras.Sequential(
         [
-            layers.Input((28, 28, 1)),
+            # Note the input shape is the desired size of the image 512x512 with 3 bytes color
+            layers.Input((512, 512, 3)),
             layers.Conv2D(16, 3, padding="same"),
             layers.Conv2D(32, 3, padding="same"),
             layers.MaxPooling2D(),
             layers.Flatten(),
-            layers.Dense(10),
+            layers.Dense(16),
         ]
     )
 
