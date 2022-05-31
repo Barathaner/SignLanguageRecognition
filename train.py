@@ -5,8 +5,10 @@ from preprocessing.featureextraction import *
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-#training main --> MODEL &&& testing vom CNN -- exportiere Model
-#irgendwoanders visualize main (Model,webcam)--> lädt model und wertet aus und visualisiert
+from os.path import exists
+
+# training main --> MODEL &&& testing vom CNN -- exportiere Model
+# irgendwoanders visualize main (Model,webcam)--> lädt model und wertet aus und visualisiert
 if __name__ == "__main__":
     #clean data and put it into /data/train/
     #dr = Dataretrieval(CleanCHALearn())
@@ -15,11 +17,19 @@ if __name__ == "__main__":
     #fe.extractFeature("data/train")
     directory = 'data/features/skeletons/'
     df = pd.read_csv(directory + 'train.csv')
+
+    # filter for images that exist
+    for index, file_name in enumerate(df['file_name']):
+        if (not exists(directory + file_name)):
+            df = df.drop(index=index, axis=0)
+
+    df = df.reset_index(drop=True)
+
     file_paths = df['file_name'].values
     labels = df['word'].values
-    ds_train = tf.data.Dataset.from_tensor_slices((file_paths,labels))
+    ds_train = tf.data.Dataset.from_tensor_slices((file_paths, labels))
 
-    def read_image(image_file,label):
+    def read_image(image_file, label):
         image = tf.io.read_file(directory + image_file)
         image = tf.image.decode_image(image,channels=3,dtype=tf.float32)
         return image,label

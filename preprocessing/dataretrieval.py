@@ -106,6 +106,7 @@ class CleanCHALearn(Strategy):
 
         df = pd.read_csv('data/testdata/train_labels.csv', header=None)
         df = df.loc[df[1].isin(word_numbers_to_filter)]
+
         df = df.reset_index()
         with open('train.csv', 'w', newline='') as f:
             thewriter = csv.writer(f)
