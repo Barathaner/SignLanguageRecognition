@@ -52,7 +52,7 @@ class FeatureExtraction():
         # ...
 
         print("Featureextraction: get Features with Strategy")
-        self._strategy.do_algorithm(cleaned_data_dir)
+        self._strategy.do_algorithm(cleaned_data_dir,source_data_dir)
         # print(",".join(result))
 
         # ...
@@ -68,7 +68,7 @@ class Strategy(ABC):
     """
 
     @abstractmethod
-    def do_algorithm(self, cleaned_data_dir: str):
+    def do_algorithm(self, cleaned_data_dir: str,destination_dir: str):
         pass
 
 
@@ -83,24 +83,22 @@ class Skelleting_as_image(Strategy):
     TASK: generate marker for each joint saved as image
     """
 
-    def do_algorithm(self, cleaned_data_dir: str):
+    def do_algorithm(self, cleaned_data_dir: str,destination_dir: str):
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_hands = mp.solutions.hands
         mp_pose = mp.solutions.pose
 
         video_names = os.listdir(cleaned_data_dir)
-        video_paths = [cleaned_data_dir + "/" + vid for vid in video_names]
+        video_paths = [cleaned_data_dir + vid for vid in video_names]
         # os.chdir(cleaned_data_dir)
         # os.chdir("../features/skeletons")
         for video_name in video_names:
             try:
                 cap = cv2.VideoCapture(cv2.samples.findFile(
-                    cleaned_data_dir + "/" + video_name))  # cv2.samples.findFile("signer0_sample1_color.mp4")
+                    cleaned_data_dir + video_name))  # cv2.samples.findFile("signer0_sample1_color.mp4")
             except:
                 print("Shitted in my pants")
-            finally:
-                continue
 
             if cap.isOpened():
                 # get vcap property
@@ -121,7 +119,7 @@ class Skelleting_as_image(Strategy):
                         if not success:
                             print("Ignoring empty camera frame.")
                             # If loading a video, use 'break' instead of 'continue'.
-                            cv2.imwrite("data/features/skeletons/" + video_name[:-4] + "_skeleton" + ".jpg", mask)
+                            cv2.imwrite(destination_dir + video_name[:-4] + "_skeleton" + ".jpg", mask)
                             break
 
                         # To improve performance, optionally mark the image as not writeable to

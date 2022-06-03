@@ -2,7 +2,7 @@ from keras.optimizers import RMSprop
 
 from preprocessing.dataretrieval import *
 from preprocessing.featureextraction import *
-
+#
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -16,8 +16,14 @@ if __name__ == "__main__":
     # dr.retrieve(["sister", "friend"])
     # fe = FeatureExtraction(Skelleting_as_image())
     # fe.extractFeature("data/train")
-    directory = 'data/features/skeletons/'
-    df = pd.read_csv(directory + 'train.csv')
+
+    drtest = Dataretrieval(CleanCHALearn())
+    drtest.retrieve(["sister", "friend"],destination_folder='data/test/',source_folder='data/raw/test/',source_CSV_path="data/testdata/ground_truth.csv", dest_CSV_path="data/features/skeletons/test.csv")
+    fetest = FeatureExtraction(Skelleting_as_image())
+    fetest.extractFeature("data/test/", "data/features/skeletons_test/")
+
+    directory = 'data/features/skeletons_test/'
+    df = pd.read_csv("data/features/skeletons/test.csv")
 
     # filter for images that exist
     for index, file_name in enumerate(df['file_name']):
@@ -28,6 +34,10 @@ if __name__ == "__main__":
 
     file_paths = df['file_name'].values
     labels = df['word'].values
+
+
+
+
     ds_train = tf.data.Dataset.from_tensor_slices((file_paths, labels))
     ds_test = tf.data.Dataset.from_tensor_slices((file_paths, labels))
 

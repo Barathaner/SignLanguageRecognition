@@ -46,7 +46,7 @@ class Dataretrieval():
         self._strategy = strategy
 
     def retrieve(self, word_list, source_folder: Optional[str] = None,
-                 destination_folder: Optional[str] = None) -> None:
+                 destination_folder: Optional[str] = None,  source_CSV_path: Optional[str] = None, dest_CSV_path: Optional[str] = None) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
@@ -55,7 +55,7 @@ class Dataretrieval():
         # ...
 
         print("Context: Sorting data using the strategy (not sure how it'll do it)")
-        self._strategy.do_algorithm(word_list,source_folder,destination_folder)
+        self._strategy.do_algorithm(word_list,source_folder,destination_folder,source_CSV_path,dest_CSV_path)
         # print(",".join(result))
 
         # ...
@@ -89,7 +89,7 @@ class CleanCHALearn(Strategy):
     """
 
     def do_algorithm(self, word_numbers_to_filter: list[Union[int, str]], source_folder: Optional[str] = None,
-                     destination_folder: Optional[str] = None):
+                     destination_folder: Optional[str] = None,  source_CSV_path: Optional[str] = None, dest_CSV_path: Optional[str] = None):
         if not source_folder:
             source_folder = "data/raw/"
 
@@ -104,11 +104,11 @@ class CleanCHALearn(Strategy):
             dictionary = pd.read_csv('data/testdata/SignList_ClassId_TR_EN.csv').set_index('EN').to_dict()['ClassId']
             word_numbers_to_filter = [dictionary[word] for word in word_numbers_to_filter]
 
-        df = pd.read_csv('data/testdata/train_labels.csv', header=None)
+        df = pd.read_csv(source_CSV_path, header=None)
         df = df.loc[df[1].isin(word_numbers_to_filter)]
 
         df = df.reset_index()
-        with open('train.csv', 'w', newline='') as f:
+        with open(dest_CSV_path, 'w', newline='') as f:
             thewriter = csv.writer(f)
             thewriter.writerow(['file_name','word'])
             for index, row in df.iterrows():
