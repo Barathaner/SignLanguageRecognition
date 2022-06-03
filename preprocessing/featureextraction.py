@@ -43,7 +43,7 @@ class FeatureExtraction():
 
         self._strategy = strategy
 
-    def extractFeature(self, cleaned_data_dir) -> None:
+    def extractFeature(self, cleaned_data_dir, source_data_dir) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
