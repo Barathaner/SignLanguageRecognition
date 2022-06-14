@@ -1,3 +1,5 @@
+import cv2
+import numpy as np
 import pandas as pd
 from loguru import logger
 import shutil
@@ -16,14 +18,26 @@ if __name__ == "__main__":
         file_name = row['file_name']
         file_name_label = file_name.rsplit(".", 1)[0] + '.txt'
         label = row['word']
-        # TODO the content of image could be cropped to relevant parts of skeleton image, atm the whole image is labeled
-        width = 1
-        height = 1
-        x = 1 / 2
-        y = 1 / 2
+
+        src = data_src + file_name
+
+        # extract bounding box for skeleton
+        image = cv2.imread(src)
+        w, h, d = image.shape
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        non_zeros = np.transpose(np.nonzero(image_gray))
+
+        width_px = np.max(non_zeros[:, 0]) - np.min(non_zeros[:, 0])
+        height_px = np.max(non_zeros[:, 1]) - np.min(non_zeros[:, 1])
+        x_px = np.min(non_zeros[:, 0]) + 0.5 * width_px
+        y_px = np.min(non_zeros[:, 1]) + 0.5 * height_px
+
+        width = width_px / w
+        height = height_px / h
+        x = x_px / w
+        y = y_px / h
 
         # copies image to destination
-        src = data_src + file_name
         dest = "yolov5_gesture/" + train_dest + "images/" + file_name
         try:
             shutil.copyfile(src, dest)
