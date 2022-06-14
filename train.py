@@ -1,12 +1,9 @@
-import pandas as pd
 from keras.optimizers import RMSprop
 
 from preprocessing.dataretrieval import *
 from preprocessing.featureextraction import *
-#
+
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
 from os.path import exists
 
 # training main --> MODEL &&& testing vom CNN -- exportiere Model

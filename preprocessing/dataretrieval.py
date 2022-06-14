@@ -4,8 +4,8 @@ import glob
 import os
 import shutil
 from abc import ABC, abstractmethod
-from typing import List, Union, Optional
-import json
+from typing import Union, Optional
+
 import pandas as pd
 from loguru import logger
 import csv
@@ -46,7 +46,8 @@ class Dataretrieval():
         self._strategy = strategy
 
     def retrieve(self, word_list, source_folder: Optional[str] = None,
-                 destination_folder: Optional[str] = None,  source_CSV_path: Optional[str] = None, dest_CSV_path: Optional[str] = None) -> None:
+                 destination_folder: Optional[str] = None, source_CSV_path: Optional[str] = None,
+                 dest_CSV_path: Optional[str] = None) -> None:
         """
         The Context delegates some work to the Strategy object instead of
         implementing multiple versions of the algorithm on its own.
@@ -55,7 +56,7 @@ class Dataretrieval():
         # ...
 
         print("Context: Sorting data using the strategy (not sure how it'll do it)")
-        self._strategy.do_algorithm(word_list,source_folder,destination_folder,source_CSV_path,dest_CSV_path)
+        self._strategy.do_algorithm(word_list, source_folder, destination_folder, source_CSV_path, dest_CSV_path)
         # print(",".join(result))
 
         # ...
@@ -89,7 +90,8 @@ class CleanCHALearn(Strategy):
     """
 
     def do_algorithm(self, word_numbers_to_filter: list[Union[int, str]], source_folder: Optional[str] = None,
-                     destination_folder: Optional[str] = None,  source_CSV_path: Optional[str] = None, dest_CSV_path: Optional[str] = None):
+                     destination_folder: Optional[str] = None, source_CSV_path: Optional[str] = None,
+                     dest_CSV_path: Optional[str] = None):
         if not source_folder:
             source_folder = "data/raw/"
 
@@ -110,15 +112,17 @@ class CleanCHALearn(Strategy):
         df = df.reset_index()
         with open(dest_CSV_path, 'w', newline='') as f:
             thewriter = csv.writer(f)
-            thewriter.writerow(['file_name','word'])
+            thewriter.writerow(['file_name', 'word'])
             for index, row in df.iterrows():
-                thewriter.writerow([row[0] + '_skeleton.jpg',row[1]])
+                thewriter.writerow([row[0] + '_skeleton.jpg', row[1]])
         # move videos to dest
         for example in df[0]:
             if example + "_color.mp4" in os.listdir(source_folder):
                 shutil.copy(source_folder + example + "_color.mp4", destination_folder + example + ".mp4")
-                logger.info('Moved ' + example + " from " + source_folder + example + " to " + destination_folder + example)
+                logger.info(
+                    'Moved ' + example + " from " + source_folder + example + " to " + destination_folder + example)
         pass
+
 
 class RetrieveSIGNDICT(Strategy):
     # TODO

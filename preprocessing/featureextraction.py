@@ -52,7 +52,7 @@ class FeatureExtraction():
         # ...
 
         print("Featureextraction: get Features with Strategy")
-        self._strategy.do_algorithm(cleaned_data_dir,source_data_dir)
+        self._strategy.do_algorithm(cleaned_data_dir, source_data_dir)
         # print(",".join(result))
 
         # ...
@@ -68,7 +68,7 @@ class Strategy(ABC):
     """
 
     @abstractmethod
-    def do_algorithm(self, cleaned_data_dir: str,destination_dir: str):
+    def do_algorithm(self, cleaned_data_dir: str, destination_dir: str):
         pass
 
 
@@ -83,7 +83,7 @@ class Skelleting_as_image(Strategy):
     TASK: generate marker for each joint saved as image
     """
 
-    def do_algorithm(self, cleaned_data_dir: str,destination_dir: str):
+    def do_algorithm(self, cleaned_data_dir: str, destination_dir: str):
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_hands = mp.solutions.hands

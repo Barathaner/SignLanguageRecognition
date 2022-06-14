@@ -1,4 +1,3 @@
-import torch
 import pandas as pd
 from loguru import logger
 import shutil
