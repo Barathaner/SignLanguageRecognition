@@ -8,6 +8,7 @@
 import cv2
 from datetime import datetime, timedelta
 
+from preprocessing.featureextraction import *
 # the duration (in seconds)
 duration = 5
 cap = cv2.VideoCapture(0)
@@ -22,9 +23,10 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 img_size = 512
 video_duration = 2
 recording = False
+extract = False
 start_time_recording = None
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
-out = cv2.VideoWriter('output.mp4',fourcc, 30, (512,512))
+out = cv2.VideoWriter('fromWebcam/output.mp4',fourcc, 30, (512,512))
 
 while True:
     ret, frame = cap.read()
@@ -38,6 +40,11 @@ while True:
 
     if k & 0xFF == ord("q"):  # quit all
         qu = 1
+        break
+
+    if k & 0xFF == ord("x"):  # quit all
+        fetest = FeatureExtraction(Skelleting_as_image())
+        fetest.extractFeature("fromWebcam/", "fromWebcam/")
         break
 
     while recording:
@@ -74,7 +81,7 @@ while True:
 
                 if (crop_img.shape[0] == img_size and crop_img.shape[1] == img_size):
                     out.write(crop_img)
-
+                out.write(crop_img)
                 cv2.putText(crop_img, "recording", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
                     cv2.LINE_AA)  # adding timer text
                 cv2.imshow('frame', crop_img)
