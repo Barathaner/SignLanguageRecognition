@@ -17,12 +17,12 @@ if __name__ == "__main__":
 
     drtest = Dataretrieval(CleanCHALearn())
     drtest.retrieve(["sister", "friend"], destination_folder='data/test/', source_folder='data/raw/test/',
-                    source_CSV_path="data/testdata/ground_truth.csv", dest_CSV_path="data/features/skeletons/test.csv")
+                    source_CSV_path="data/testdata/ground_truth.csv", dest_CSV_path="data/features/skeletons_test/test.csv")
     fetest = FeatureExtraction(Skelleting_as_image())
     fetest.extractFeature("data/test/", "data/features/skeletons_test/")
 
     directory = 'data/features/skeletons_test/'
-    df = pd.read_csv("data/features/skeletons/test.csv")
+    df = pd.read_csv("data/features/skeletons_test/test.csv")
 
     df_train = pd.read_csv("data/features/skeletons/train.csv")
 

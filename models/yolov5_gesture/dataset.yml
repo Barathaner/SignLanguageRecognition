@@ -1,5 +1,5 @@
-train: data/train/images
-#val: /workspace/data/valid/images
+train: ../yolov5_gesture/train/images
+val: ../yolov5_gesture/valid/images
 
 nc: 2
-names: ['sister','tree']
+names: ['sister','friend']
