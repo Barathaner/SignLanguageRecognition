@@ -50,6 +50,7 @@ while True:
     while recording:
         ret, frame = cap.read()
         k = cv2.waitKey(3)
+        frame = cv2.flip(frame,1)
         if (datetime.now() - start_time_recording).seconds <= video_duration:
 
             if ret == True:

@@ -8,65 +8,24 @@ import os
 if __name__ == "__main__":
 
     # create lables for yolov5
-    data_src = "../data/features/skeletons/"
+    data_src = "../../data/features/skeletons_test/"
     # data_src = "../data/features/skeletons_test/"
     train_dest = "train/"
     test_dest = "valid/"
     print(os.getcwd())
     # valid_dest = "./valid/"
     # 15 256 256 512 512
-
-    df = pd.read_csv(data_src + "train.csv")
-    for index, row in df.iterrows():
-        file_name = row['file_name']
-        file_name_label = file_name.rsplit(".", 1)[0] + '.txt'
-        label = row['word']
-        if label == 15:
-            label = 1
-        src = data_src + file_name
-        # copies image to destination
-        dest = "yolov5_gesture/" + train_dest + "images/" + file_name
-        try:
-            shutil.copyfile(src, dest)
-        except:
-            logger.warning("File not found: " + file_name)
-            continue
-
-        # extract bounding box for skeleton
-        image = cv2.imread(src)
-        w, h, d = image.shape
-        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        non_zeros = np.transpose(np.nonzero(image_gray))
-
-        width_px = np.max(non_zeros[:, 0]) - np.min(non_zeros[:, 0])
-        height_px = np.max(non_zeros[:, 1]) - np.min(non_zeros[:, 1])
-        x_px = np.min(non_zeros[:, 0]) + 0.5 * width_px
-        y_px = np.min(non_zeros[:, 1]) + 0.5 * height_px
-
-        width = width_px / w
-        height = height_px / h
-        x = x_px / w
-        y = y_px / h
-
-
-        # creates a text file with similar name from corresponding image if not already created, 'w' to replace
-        with open("yolov5_gesture/" + train_dest + 'labels/' + file_name_label, 'x') as f:
-            logger.debug("create yolov5 label for image " + row['file_name'])
-            f.write(f"{label} {x} {y} {width} {height}")
-
-    # der gleiche Schmutz für kack
-    # df_test = pd.read_csv(data_src + "test.csv")
-    # for index, row in df_test.iterrows():
+    #
+    # df = pd.read_csv(data_src + "train.csv")
+    # for index, row in df.iterrows():
     #     file_name = row['file_name']
     #     file_name_label = file_name.rsplit(".", 1)[0] + '.txt'
-    #
     #     label = row['word']
     #     if label == 15:
     #         label = 1
-    #
     #     src = data_src + file_name
     #     # copies image to destination
-    #     dest = "yolov5_gesture/" + test_dest + "images/" + file_name
+    #     dest = "../yolov5_gesture/" + train_dest + "images/" + file_name
     #     try:
     #         shutil.copyfile(src, dest)
     #     except:
@@ -89,10 +48,51 @@ if __name__ == "__main__":
     #     x = x_px / w
     #     y = y_px / h
     #
+    #
     #     # creates a text file with similar name from corresponding image if not already created, 'w' to replace
-    #     with open("yolov5_gesture/" + test_dest + 'labels/' + file_name_label, 'x') as f:
+    #     with open("../yolov5_gesture/" + train_dest + 'labels/' + file_name_label, 'x') as f:
     #         logger.debug("create yolov5 label for image " + row['file_name'])
-    #         f.write(f"{label} {x} {y} {width} {height}")
+    #         f.write(f"{label} {y} {x} {height} {width}")
+
+    # der gleiche Schmutz für kack
+    df_test = pd.read_csv(data_src + "test.csv")
+    for index, row in df_test.iterrows():
+        file_name = row['file_name']
+        file_name_label = file_name.rsplit(".", 1)[0] + '.txt'
+
+        label = row['word']
+        if label == 15:
+            label = 1
+
+        src = data_src + file_name
+        # copies image to destination
+        dest = "../yolov5_gesture/" + test_dest + "images/" + file_name
+        try:
+            shutil.copyfile(src, dest)
+        except:
+            logger.warning("File not found: " + file_name)
+            continue
+
+        # extract bounding box for skeleton
+        image = cv2.imread(src)
+        w, h, d = image.shape
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        non_zeros = np.transpose(np.nonzero(image_gray))
+
+        width_px = np.max(non_zeros[:, 0]) - np.min(non_zeros[:, 0])
+        height_px = np.max(non_zeros[:, 1]) - np.min(non_zeros[:, 1])
+        x_px = np.min(non_zeros[:, 0]) + 0.5 * width_px
+        y_px = np.min(non_zeros[:, 1]) + 0.5 * height_px
+
+        width = width_px / w
+        height = height_px / h
+        x = x_px / w
+        y = y_px / h
+
+        # creates a text file with similar name from corresponding image if not already created, 'w' to replace
+        with open("../yolov5_gesture/" + test_dest + 'labels/' + file_name_label, 'x') as f:
+            logger.debug("create yolov5 label for image " + row['file_name'])
+            f.write(f"{label} {y} {x} {height} {width}")
     # Model
     # model = torch.hub.load('ultralytics/yolov5', 'yolov5s')  # or yolov5n - yolov5x6, custom
 
