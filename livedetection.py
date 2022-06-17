@@ -84,7 +84,7 @@ if __name__ == "__main__":
     mp_hands = mp.solutions.hands
     mp_pose = mp.solutions.pose
     imagestream= []
-    model = torch.hub.load('C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5', 'custom',path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5_gesture/weights/best.pt', source='local', device='cpu')
+    model = torch.hub.load('D:/Private Dokumente/HTWK/2_SS22/SignLanguageRecognition/models/yolov5', 'custom',path='D:/Private Dokumente/HTWK/2_SS22/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local')
     while True:
         ret, frame = cap.read()
         frame = cv2.flip(frame, 1)
@@ -103,16 +103,17 @@ if __name__ == "__main__":
 
         for skeletons in imagestream:
             skeletonFlowFused += skeletons
-
-        results = model(skeletonFlowFused,size=512)
-        boxes = results.pandas().xyxy[0]
-        if len(boxes) >0:
-            print(boxes)
-            labelstring = "Class: "+ boxes.iat[0,6]+ " {:.9f}".format(boxes.iat[0, 4])
-            cv2.putText(frame, labelstring, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-            frame = cv2.rectangle(frame, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), (int(boxes.iat[0,2]),int(boxes.iat[0,3])), (255,255,255), 3)
+        if 29 <= len(imagestream) <= 31:
+            results = model(skeletonFlowFused,size=512)
+            boxes = results.pandas().xyxy[0]
+            if len(boxes) >0:
+                print(boxes)
+                labelstring = "Class: "+ boxes.iat[0,6]+ " {:.9f}".format(boxes.iat[0, 4])
+                cv2.putText(frame, labelstring, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+                frame = cv2.rectangle(frame, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), (int(boxes.iat[0,2]),int(boxes.iat[0,3])), (255,255,255), 3)
 
         cv2.imshow("Webcam", frame)
+        cv2.imshow("Skeleton", skeletonFlowFused)
         k = cv2.waitKey(2)
         if k & 0xFF == ord("q"):  # quit all
             break
