@@ -61,6 +61,9 @@ def detectSkeleton(drawing,drawing_styles,hands,pose,img):
             image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             #hands
             results = hands.process(image)
+
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     mp_hands = mp.solutions.hands
     mp_pose = mp.solutions.pose
     imagestream= []
-    model = torch.hub.load('D:/Private Dokumente/HTWK/2_SS22/SignLanguageRecognition/models/yolov5', 'custom',path='D:/Private Dokumente/HTWK/2_SS22/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local')
+    model = torch.hub.load('C:/Users\karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5', 'custom',path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local', device='cpu')
     while True:
         ret, frame = cap.read()
         frame = cv2.flip(frame, 1)
@@ -94,23 +97,26 @@ if __name__ == "__main__":
         if not ret:
             print("Ignoring empty camera frame.")
             continue
-        if len(imagestream) < 30:
+        if len(imagestream) < 15:
             skeletonFlow = detectSkeleton(mp_drawing,mp_drawing_styles,mp_hands,mp_pose,frame)
             imagestream.append(skeletonFlow)
-        if len(imagestream) >= 30:
+        if len(imagestream) >= 15:
             del imagestream[0]
             del imagestream[0]
 
         for skeletons in imagestream:
             skeletonFlowFused += skeletons
-        if 29 <= len(imagestream) <= 31:
+        if 13 <= len(imagestream) <= 17:
             results = model(skeletonFlowFused,size=512)
             boxes = results.pandas().xyxy[0]
-            if len(boxes) >0:
-                print(boxes)
-                labelstring = "Class: "+ boxes.iat[0,6]+ " {:.9f}".format(boxes.iat[0, 4])
-                cv2.putText(frame, labelstring, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-                frame = cv2.rectangle(frame, (int(boxes.iat[0,0]),int(boxes.iat[0,1])), (int(boxes.iat[0,2]),int(boxes.iat[0,3])), (255,255,255), 3)
+            if len(boxes) > 0:
+                maxob= boxes['confidence'].idxmax()
+                if boxes.iat[maxob, 4] > 0.5:
+                    labelstring = "Class: " + boxes.iat[maxob, 6] + " {:.9f}".format(boxes.iat[maxob, 4])
+                    cv2.putText(frame, labelstring, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                (255, 255, 255), 2, cv2.LINE_AA)
+                    frame = cv2.rectangle(frame, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])),
+                                          (int(boxes.iat[maxob, 2]), int(boxes.iat[maxob, 3])), (255, 255, 255), 3)
 
         cv2.imshow("Webcam", frame)
         cv2.imshow("Skeleton", skeletonFlowFused)
