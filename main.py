@@ -7,6 +7,11 @@
 
 import cv2
 from datetime import datetime, timedelta
+import cv2
+import mediapipe as mp
+import numpy as np
+import tensorflow as tf
+import torch
 
 from preprocessing.featureextraction import *
 # the duration (in seconds)
@@ -28,90 +33,113 @@ start_time_recording = None
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 out = cv2.VideoWriter('fromWebcam/output.mp4',fourcc, 30, (512,512))
 
-while True:
-    ret, frame = cap.read()
-    cv2.imshow('frame', frame)
-    k = cv2.waitKey(10)
-    if k & 0xFF == ord("s"):  # reset the timer
-        start_time_capturestart = datetime.now()
-        end_time_capturestart = datetime.now() + timedelta(seconds=countdown)
-        diff = (end_time_capturestart - datetime.now()).seconds  # converting into seconds
-        counting = True
 
-    if k & 0xFF == ord("q"):  # quit all
-        qu = 1
-        break
+if __name__ == "__main__":
+    imagestream = []
+    model = torch.hub.load('C:/Users\karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5',
+                           'custom',
+                           path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/weights/best_b16_e100.pt',
+                           source='local', device='cpu')
 
-    if k & 0xFF == ord("x"):  # quit all
-        fetest = FeatureExtraction(Skelleting_as_image())
-        fetest.extractFeature("fromWebcam/", "fromWebcam/")
-        break
-
-    while recording:
+    while True:
         ret, frame = cap.read()
-        k = cv2.waitKey(3)
-        frame = cv2.flip(frame,1)
-        if (datetime.now() - start_time_recording).seconds <= video_duration:
-
-            if ret == True:
-                a1 = width / height
-                a2 = height / width
-
-                if (a1 > a2):
-
-                    # if width greater than height
-                    r_img = cv2.resize(frame, (round(img_size * a1), img_size), interpolation=cv2.INTER_AREA)
-                    margin = int(r_img.shape[1] / 6)
-                    crop_img = r_img[0:img_size, margin:(margin + img_size)]
-
-                elif (a1 < a2):
-
-                    # if height greater than width
-                    r_img = cv2.resize(frame, (img_size, round(img_size * a2)), interpolation=cv2.INTER_AREA)
-                    margin = int(r_img.shape[0] / 6)
-                    crop_img = r_img[margin:(margin + img_size), 0:img_size]
-
-                elif (a1 == a2):
-
-                    # if height and width are equal
-                    r_img = cv2.resize(frame, (img_size, round(img_size * a2)), interpolation=cv2.INTER_AREA)
-                    crop_img = r_img[0:img_size, 0:img_size]
-
-                if (crop_img.shape[0] != img_size or crop_img.shape[1] != img_size):
-                    crop_img = r_img[0:img_size, 0:img_size]
-
-                if (crop_img.shape[0] == img_size and crop_img.shape[1] == img_size):
-                    out.write(crop_img)
-                out.write(crop_img)
-                cv2.putText(crop_img, "recording", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
-                    cv2.LINE_AA)  # adding timer text
-                cv2.imshow('frame', crop_img)
-        else:
-            recording = False
-            out.release()
-
-    while counting:
-
-        ret, frame = cap.read()
-        cv2.putText(frame, str(diff), (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
-                    cv2.LINE_AA)  # adding timer text
         cv2.imshow('frame', frame)
-        diff = (end_time_capturestart - datetime.now()).seconds  # converting into seconds
         k = cv2.waitKey(10)
+        if k & 0xFF == ord("s"):  # reset the timer
+            start_time_capturestart = datetime.now()
+            end_time_capturestart = datetime.now() + timedelta(seconds=countdown)
+            diff = (end_time_capturestart - datetime.now()).seconds  # converting into seconds
+            counting = True
 
         if k & 0xFF == ord("q"):  # quit all
             qu = 1
             break
 
-        if diff == 0:
-            recording = True
-            start_time_recording=datetime.now()
-            counting = False
+        if k & 0xFF == ord("x"):  # quit all
+            fetest = FeatureExtraction(Skelleting_as_image())
+            fetest.extractFeature("fromWebcam/", "fromWebcam/")
+
+
+        if k & 0xFF == ord("d"):  # quit all
+            skeletonpic= cv2.imread("fromWebcam/output_skeleton.jpg")
+            skeletonpic = cv2.cvtColor(skeletonpic, cv2.COLOR_BGR2RGB)
+            results = model(skeletonpic,size=512)
+            boxes = results.pandas().xyxy[0]
+            if len(boxes) > 0:
+                maxob= boxes['confidence'].idxmax()
+                if boxes.iat[maxob, 4] > 0.3:
+                    labelstring = "Class: " + boxes.iat[maxob, 6] + " {:.9f}".format(boxes.iat[maxob, 4])
+                    cv2.putText(skeletonpic, labelstring, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                (255, 255, 255), 2, cv2.LINE_AA)
+                    skeletonpic = cv2.rectangle(skeletonpic, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])),
+                                          (int(boxes.iat[maxob, 2]), int(boxes.iat[maxob, 3])), (255, 255, 255), 3)
+                    cv2.imshow("Detected", skeletonpic)
+
+        while recording:
+            ret, frame = cap.read()
+            k = cv2.waitKey(3)
+            frame = cv2.flip(frame,1)
+            if (datetime.now() - start_time_recording).seconds <= video_duration:
+
+                if ret == True:
+                    a1 = width / height
+                    a2 = height / width
+
+                    if (a1 > a2):
+
+                        # if width greater than height
+                        r_img = cv2.resize(frame, (round(img_size * a1), img_size), interpolation=cv2.INTER_AREA)
+                        margin = int(r_img.shape[1] / 6)
+                        crop_img = r_img[0:img_size, margin:(margin + img_size)]
+
+                    elif (a1 < a2):
+
+                        # if height greater than width
+                        r_img = cv2.resize(frame, (img_size, round(img_size * a2)), interpolation=cv2.INTER_AREA)
+                        margin = int(r_img.shape[0] / 6)
+                        crop_img = r_img[margin:(margin + img_size), 0:img_size]
+
+                    elif (a1 == a2):
+
+                        # if height and width are equal
+                        r_img = cv2.resize(frame, (img_size, round(img_size * a2)), interpolation=cv2.INTER_AREA)
+                        crop_img = r_img[0:img_size, 0:img_size]
+
+                    if (crop_img.shape[0] != img_size or crop_img.shape[1] != img_size):
+                        crop_img = r_img[0:img_size, 0:img_size]
+
+                    if (crop_img.shape[0] == img_size and crop_img.shape[1] == img_size):
+                        out.write(crop_img)
+                    out.write(crop_img)
+                    cv2.putText(crop_img, "recording", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
+                        cv2.LINE_AA)  # adding timer text
+                    cv2.imshow('frame', crop_img)
+            else:
+                recording = False
+                out.release()
+
+        while counting:
+
+            ret, frame = cap.read()
+            cv2.putText(frame, str(diff), (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
+                        cv2.LINE_AA)  # adding timer text
+            cv2.imshow('frame', frame)
+            diff = (end_time_capturestart - datetime.now()).seconds  # converting into seconds
+            k = cv2.waitKey(10)
+
+            if k & 0xFF == ord("q"):  # quit all
+                qu = 1
+                break
+
+            if diff == 0:
+                recording = True
+                start_time_recording=datetime.now()
+                counting = False
 
 
 
-    if qu == 1:
-        break
+        if qu == 1:
+            break
 
-cap.release()
-cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()

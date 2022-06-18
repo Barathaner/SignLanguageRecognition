@@ -45,7 +45,7 @@ def crop_img_size(img,img_size_to_crop = 512):
 
 
 
-def detectSkeleton(drawing,drawing_styles,hands,pose,img):
+def detectSkeleton(mp_drawing,mp_drawing_styles,mp_hands,mp_pose,img):
     mask = np.zeros([512, 512, 3], dtype="uint8")
 
     with mp_hands.Hands(
@@ -107,6 +107,7 @@ if __name__ == "__main__":
         for skeletons in imagestream:
             skeletonFlowFused += skeletons
         if 13 <= len(imagestream) <= 17:
+            skeletonFlowFused = cv2.cvtColor(skeletonFlowFused, cv2.COLOR_BGR2RGB)
             results = model(skeletonFlowFused,size=512)
             boxes = results.pandas().xyxy[0]
             if len(boxes) > 0:
