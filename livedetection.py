@@ -84,9 +84,9 @@ if __name__ == "__main__":
     mp_hands = mp.solutions.hands
     mp_pose = mp.solutions.pose
     imagestream = []
-    # root = os.getcwd()
-    model = torch.hub.load('/home/tim/IdeaProjects/SignLanguageRecognition/models/yolov5', 'custom',
-                           path='/home/tim/IdeaProjects/SignLanguageRecognition/models/weights/best_b16_e100.pt',
+    root = os.getcwd()
+    model = torch.hub.load(root + '/models/yolov5', 'custom',
+                           path=root + '/models/weights/best_b16_e100.pt',
                            source='local', device='cpu')
     # model = torch.hub.load('C:/Users\karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5', 'custom',path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local', device='cpu')
     while True:
