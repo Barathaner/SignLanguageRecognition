@@ -3,15 +3,15 @@ import mediapipe as mp
 import numpy as np
 import tensorflow as tf
 import torch
+import os
+
 cap = cv2.VideoCapture(0)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fps = cap.get(cv2.CAP_PROP_FPS)
 
 
-
-def crop_img_size(img,img_size_to_crop = 512):
-
+def crop_img_size(img, img_size_to_crop=512):
     if ret == True:
         a1 = width / height
         a2 = height / width
@@ -39,13 +39,10 @@ def crop_img_size(img,img_size_to_crop = 512):
         if (crop_img.shape[0] != img_size_to_crop or crop_img.shape[1] != img_size_to_crop):
             crop_img = r_img[0:img_size_to_crop, 0:img_size_to_crop]
 
-
         return crop_img
 
 
-
-
-def detectSkeleton(mp_drawing,mp_drawing_styles,mp_hands,mp_pose,img):
+def detectSkeleton(mp_drawing, mp_drawing_styles, mp_hands, mp_pose, img):
     mask = np.zeros([512, 512, 3], dtype="uint8")
 
     with mp_hands.Hands(
@@ -59,7 +56,7 @@ def detectSkeleton(mp_drawing,mp_drawing_styles,mp_hands,mp_pose,img):
             # pass by reference.
             img.flags.writeable = False
             image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            #hands
+            # hands
             results = hands.process(image)
 
             image.flags.writeable = True
@@ -86,19 +83,23 @@ if __name__ == "__main__":
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_hands = mp.solutions.hands
     mp_pose = mp.solutions.pose
-    imagestream= []
-    model = torch.hub.load('C:/Users\karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5', 'custom',path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local', device='cpu')
+    imagestream = []
+    # root = os.getcwd()
+    model = torch.hub.load('/home/tim/IdeaProjects/SignLanguageRecognition/models/yolov5', 'custom',
+                           path='/home/tim/IdeaProjects/SignLanguageRecognition/models/weights/best_b16_e100.pt',
+                           source='local', device='cpu')
+    # model = torch.hub.load('C:/Users\karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/yolov5', 'custom',path='C:/Users/karl-/PycharmProjects/Mustererkennung/SignLanguageRecognition/models/weights/best_b16_e100.pt', source='local', device='cpu')
     while True:
         ret, frame = cap.read()
         frame = cv2.flip(frame, 1)
-        frame = crop_img_size(frame,512)
+        frame = crop_img_size(frame, 512)
         skeletonFlowFused = np.zeros([512, 512, 3], dtype="uint8")
         skeletonFlow = np.zeros([512, 512, 3], dtype="uint8")
         if not ret:
             print("Ignoring empty camera frame.")
             continue
         if len(imagestream) < 15:
-            skeletonFlow = detectSkeleton(mp_drawing,mp_drawing_styles,mp_hands,mp_pose,frame)
+            skeletonFlow = detectSkeleton(mp_drawing, mp_drawing_styles, mp_hands, mp_pose, frame)
             imagestream.append(skeletonFlow)
         if len(imagestream) >= 15:
             del imagestream[0]
@@ -108,24 +109,25 @@ if __name__ == "__main__":
             skeletonFlowFused += skeletons
         if 13 <= len(imagestream) <= 17:
             skeletonFlowFused = cv2.cvtColor(skeletonFlowFused, cv2.COLOR_BGR2RGB)
-            results = model(skeletonFlowFused,size=512)
+            results = model(skeletonFlowFused, size=512)
             boxes = results.pandas().xyxy[0]
             if len(boxes) > 0:
-                maxob= boxes['confidence'].idxmax()
+                maxob = boxes['confidence'].idxmax()
                 if boxes.iat[maxob, 4] > 0.5:
                     labelstring = "Class: " + boxes.iat[maxob, 6] + " {:.9f}".format(boxes.iat[maxob, 4])
-                    cv2.putText(frame, labelstring, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                    cv2.putText(frame, labelstring, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1,
                                 (255, 255, 255), 2, cv2.LINE_AA)
                     frame = cv2.rectangle(frame, (int(boxes.iat[maxob, 0]), int(boxes.iat[maxob, 1])),
                                           (int(boxes.iat[maxob, 2]), int(boxes.iat[maxob, 3])), (255, 255, 255), 3)
 
-        cv2.imshow("Webcam", frame)
-        cv2.imshow("Skeleton", skeletonFlowFused)
-        k = cv2.waitKey(2)
-        if k & 0xFF == ord("q"):  # quit all
-            break
-
-
-
+        preview = np.concatenate((frame, skeletonFlowFused), axis=1)
+        # resize preview for better visibility
+        resize_multiplier = 1.3
+        preview = cv2.resize(preview, (0, 0), fx=resize_multiplier, fy=resize_multiplier)
+        # show preview
+        cv2.imshow('Gesture Recognition', preview)
+        if cv2.waitKey(1) == 27 or cv2.waitKey(2) & 0xFF == ord("q"):
+            break  # esc or 'q' to quit
 cap.release()
 cv2.destroyAllWindows()
