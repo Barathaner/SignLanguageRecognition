@@ -3,3 +3,6 @@ pandas
 opencv-python
 mediapipe
 tensorflow
+torch
+torchvision
+torchaudio
