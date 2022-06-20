@@ -1,5 +1,16 @@
 # SignLanguageRecognition
 
+## installation
+### install dependencies
+
+`pip install -r requirements.txt`
+
+### clone yolov5 into models
+
+`cd models`
+
+`git clone git@github.com:ultralytics/yolov5.git`
+
 ## Ordnerstruktur
 
 ```
