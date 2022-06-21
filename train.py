@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     #
     #
-    #
+    # Epoch
     # for epoch in range(2):
     #     for x, y in ds_train:
     #         # train here
