@@ -1,65 +1,45 @@
 # SignLanguageRecognition
 
-## installation
-### install dependencies
+Live classification of sign language into words via webcam.  
 
-`pip install -r requirements.txt`
+## Installation
 
-### clone yolov5 into models
+### Install dependencies
 
-`cd models`
-
-`git clone git@github.com:ultralytics/yolov5.git`
-
-## Ordnerstruktur
-
-```
-- features/ 
-    - skeletons/
-- raw/
-- testdata/
-- train/
+```sh
+pip install -r requirements.txt
 ```
 
+### Clone yolov5 into `models/`
 
-## 1. Datensatz bekommen
-- Minimalanforderung: 2 - 3 verschiedene Gesten
-- convinient: gelabelte Daten über API
-- Bsp: Chalern
+```sh
+git clone git@github.com:ultralytics/yolov5.git models/yolov5
+```
 
---> https://chalearnlap.cvc.uab.cat/dataset/40/description/ NAME: musterkek PW:3-_QfQXGTTJt8a#W
+## Run
 
+- <kbd>Esc</kbd> or <kbd>q</kbd> to close the window 
 
-oder--> https://github.com/dxli94/WLASL American(scrapes webpages)
-## 2. Datensatz verfremden/transformieren - "Aufblähen"
-- Stichwort "augmented data"
-- verändern von: Helligkeit, Farben, Rotation, Translation
-- Kombinationen möglich
+```sh
+python livedetection.py
+```
+> Tested with words: `friend`, `sister`
 
-### 2.1 Skelletierung auf dem Datensatz anwenden (Optional)
-- Eingabe: Video, Ausgabe: Video
-- Minimalanforderung: Hand skelletiert
-- Idealvorstellung: Skelletierung des gesamten Körpers
-- Datensatz aus Punkt 2 benutzen
-- [Mediapipe holistic](https://google.github.io/mediapipe/solutions/holistic.html)
+- It opens a side-by-side window
+  - Left: Live-Webcam with ROI, Right: Skeleton-Flow
 
-## 3. Abstrahierung der Videodaten auf ein Bild
-### Strategie 1: OPTiCAL flow
-- durch arithmetisches Mittel und Varianz
-### Strategie 2: Skelletpunkte einfärben
-- vordef. Farbe für jeden Skelletpunkt.
-- Normierung der Skellette (Körpergröße/Handgröße/Entfernung zur Kamera - irrelevant)
-- Farbhelligkeit korrelliert mit Zeit (umso später, umso dunkler)
-- arithmetisches Mittel aus den "bunten Skelletten"
+## Functionality
 
-#### *Teilergebnis: Gelabelter Datensatz aus abstakten Bildern mit Gestenwort.*
+- [Dataset](https://chalearnlap.cvc.uab.cat/dataset/40/description/) for train and test: 
+- [Mediapipe](https://google.github.io/mediapipe/) for skeleton
+  - [Pose](https://google.github.io/mediapipe/solutions/pose.html)
+  - [Hands](https://google.github.io/mediapipe/solutions/hands.html)
+- [OpenCV](https://opencv.org/) for image processing
+- [YOLOv5](https://github.com/ultralytics/yolov5) for object detection (classification)
+  - Model: [YOLOv5s](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data#2-select-a-model)
+  - trained model with YOLOv5 with command (with best results):
 
-## 4. KNN zur Klassifikation erstellen
-
-### 4.1. zusätzliche Merkmale als Eingansgrößen definieren (Optional)
-- zusätzlich zu den OPTiCAL flow Bildern
-- Varianz, Standardabweichung, ...
-
-### 4.2. yolo4 CNN anlernen
-- evtl. Mehrschichtig mit Merkmale aus 4.1
-- yolo4 ist bereits angelernt! Anpassung der letzten Schichten (Gewichte entfernen)
+  ```sh
+  python train.py --img 512 --batch 16 --epochs 100 --data models/yolov5_gesture/dataset.yaml --weights models/yolov5_gesture/yolov5s.pt
+  ```
+  
